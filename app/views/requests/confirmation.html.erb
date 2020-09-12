@@ -4,3 +4,14 @@
 <p>There you will find the following steps to confirm your request</p>
 
 <p>note: You're request will be disregarded if it's not confirmed by the end of the day (11:59pm)</p>
+
+
+
+<% if Rails.env.development? %>
+  <%= link_to 'Check the mail preview here', "http://localhost:3000/letter_opener" %>
+<% end %>
+
+
+<% if Rails.env.production? %>
+  <%= link_to 'Check the mail preview here', "https://irl-junior-backend-challenge.herokuapp.com//letter_opener" %>
+<% end %>

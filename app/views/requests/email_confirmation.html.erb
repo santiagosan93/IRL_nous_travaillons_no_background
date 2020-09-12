@@ -1,1 +1,12 @@
 <h1>Thank you so mutch. You're request has been confirmed!</h1>
+
+<% if @request.que_number > @max_capacity %>
+  <p>Currently our office is full, and as soon as we have space for you wi will let you know</p>
+  <p>Your current number in the waiting list is <%= @request.que_number - @max_capacity %> </p>
+  <%= link_to 'Home', root_path  %>
+<% else %>
+  <p>Congratualions! You are eligible to take part of the nous travaillons expirience</p>
+  <%= link_to "I understand the legal terms of the contract and I want to sign it", request_contracts_path(@request), method: :post  %>
+<% end %>
+
+

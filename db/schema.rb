@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_12_142826) do
+ActiveRecord::Schema.define(version: 2020_09_12_194110) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "contracts", force: :cascade do |t|
+    t.date "expiery_date"
+    t.boolean "expired", default: false
+    t.bigint "request_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["request_id"], name: "index_contracts_on_request_id"
+  end
 
   create_table "requests", force: :cascade do |t|
     t.string "first_name"
@@ -25,6 +34,8 @@ ActiveRecord::Schema.define(version: 2020_09_12_142826) do
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "accepted", default: false
     t.boolean "confirmed", default: false
+    t.integer "que_number"
+    t.boolean "expired", default: false
   end
 
 end

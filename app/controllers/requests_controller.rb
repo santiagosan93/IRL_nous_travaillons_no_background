@@ -15,7 +15,8 @@ class RequestsController < ApplicationController
   end
 
   def email_confirmation
-    @request.confirmed = true
+    @request.accept!
+    @request.assign_que_number
     @request.save
   end
 

@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  expiery_date: 2020-09-12
+  expired: false
+  request: one
+
+two:
+  expiery_date: 2020-09-12
+  expired: false
+  request: two

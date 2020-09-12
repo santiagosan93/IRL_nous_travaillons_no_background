@@ -1,12 +1,3 @@
-GIT
-  remote: git://github.com/alexrothenberg/letter_opener.git
-  revision: 50b077315f11872f1173d092ddf81b9176c9badf
-  branch: on_a_server
-  specs:
-    letter_opener (0.0.2)
-      fakefs
-      launchy
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -84,7 +75,6 @@ GEM
     concurrent-ruby (1.1.7)
     crass (1.0.6)
     erubi (1.9.0)
-    fakefs (1.2.2)
     ffi (1.13.1)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -94,6 +84,8 @@ GEM
       activesupport (>= 5.0.0)
     launchy (2.5.0)
       addressable (~> 2.7)
+    letter_opener (1.7.0)
+      launchy (~> 2.2)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -214,7 +206,7 @@ DEPENDENCIES
   byebug
   capybara (>= 2.15)
   jbuilder (~> 2.7)
-  letter_opener!
+  letter_opener
   listen (~> 3.2)
   pg (>= 0.18, < 2.0)
   puma (~> 4.1)

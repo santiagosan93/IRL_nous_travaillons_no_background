@@ -23,7 +23,8 @@ gem 'jbuilder', '~> 2.7'
 # Use Active Model has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'letter_opener'
+gem 'letter_opener',  git: "git://github.com/alexrothenberg/letter_opener.git", branch: "on_a_server"
+
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

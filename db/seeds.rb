@@ -8,7 +8,6 @@
 
 
 
-
 puts 'Deleting all contracts'
 Contract.delete_all
 puts "finished..."

@@ -16,6 +16,10 @@ class Request < ApplicationRecord
 
   has_one :contract
 
+  def renew_expiery_date
+    self.expiery_date = Date.today.next_month(3)
+  end
+
   def remove_spaces_of_phone_number
     self.phone_number = self.phone_number.gsub(' ', '')
   end
@@ -118,7 +122,7 @@ class Request < ApplicationRecord
   end
 
   def self.unaccepted_and_still_interested
-    Request.where(accepted: false).where(expired: false)
+    Request.where(accepted: false, expired: false, expiery_date: Date.today + 7)
   end
 
   private

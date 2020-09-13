@@ -19,6 +19,7 @@ class RequestsController < ApplicationController
     @request.confirm!
     @is_old_request = @request.has_que_number
     @request.assign_que_number unless @request.has_que_number
+    @request.renew_expiery_date
     @request.save
   end
 

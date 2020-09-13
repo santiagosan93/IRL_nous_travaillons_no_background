@@ -1,0 +1,12 @@
+<h1>Hello <%= @request.first_name.capitalize %></h1>
+
+<% @max_capacity = 20 %>
+
+<p>We are excited to tell you that you are now <%= @request.que_number - @max_capacity %> in line</p>
+<p>We would like to know if you are still interested in being part of our family</p>
+<br>
+<p>Bests,</p>
+<p>Your Nous Travallions team</p>
+<p>Please click here to confirm!</p>
+<br>
+ <%= link_to "Let's do this!", email_confirmation_request_url(@request)  %>

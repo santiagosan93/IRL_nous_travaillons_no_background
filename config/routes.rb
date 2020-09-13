@@ -5,9 +5,16 @@ Rails.application.routes.draw do
 
   resources :requests, only: :create do
     member do
-      get 'confirmation'
+      get 'ask_for_confirmation'
       get 'email_confirmation'
     end
+
     resources :contracts, only: :create
+  end
+
+  resources :contracts, only: [] do
+    member do
+      get 'renewal_confirmation'
+    end
   end
 end

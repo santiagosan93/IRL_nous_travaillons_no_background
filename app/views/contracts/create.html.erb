@@ -1,4 +1,8 @@
 <h1> <%= @contract.request.first_name.capitalize %> Welcome to Nous Travaillons!</h1>
+<p>Your current contract starts today and expires at <%= @contract.expiery_date.strftime('%A, %b %d') %> </p>
+<p>We will send you a mail a week before for renewall</p>
+
+<p>Thank you for choosing us!</p>
 
 
 <%= link_to 'home', root_path  %>

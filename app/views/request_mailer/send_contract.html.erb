@@ -1,0 +1,4 @@
+<h1>We have a spot for you!!!</h1>
+<p>Dear <%= @request.first_name.capitalize %> You are eligible to take part of the nous travaillons expirience</p>
+  <%= link_to "I understand the legal terms of the contract and I want to sign it", renewal_confirmation_contract_url(@request), method: :post  %>
+<p>You have one week from today to sign your contract!</p>

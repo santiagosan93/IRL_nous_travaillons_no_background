@@ -1,25 +1,30 @@
 class RequestsController < ApplicationController
-  before_action :set_request, only: [:confirmation, :email_confirmation]
+  before_action :set_request, only: [:ask_for_confirmation, :email_confirmation]
+
   def create
     @request = Request.new(request_params)
     @request.remove_spaces_of_phone_number
     if @request.save
-      redirect_to confirmation_request_path(@request)
+      redirect_to ask_for_confirmation_request_path(@request)
     else
       @errors = @request.errors.full_messages
       render "pages/home"
     end
   end
 
-  def confirmation
+  def ask_for_confirmation
   end
 
   def email_confirmation
-    @request.accept!
-    @request.assign_que_number
+    @request.confirm!
+    @is_old_request = @request.has_que_number
+    @request.assign_que_number unless @request.has_que_number
     @request.save
   end
 
+  def request_renewall_confirmation
+    @request.confirm!
+  end
 
   private
 

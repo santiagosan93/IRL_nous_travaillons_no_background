@@ -6,7 +6,9 @@ namespace :requests do
     requests = Request.unaccepted_and_still_interested
     puts "Enqueuing confirmation of #{requests.count} requests..."
     requests.each do |request|
-      RenewRequestJob.perform_later(request.id)
+      request.confirmed = false
+      request.save
+      RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
     end
   end
 end
@@ -20,7 +22,9 @@ namespace :contracts do
     contracts = Contract.expires_next_week
     puts "Enqueuing confirmation of #{contracts.count} contracts..."
     contracts.each do |contract|
-      RenewContractJob.perform_later(contract.id)
+      contract.unconfirm!
+      contract.save
+      ContractMailer.with(contract: contract).contract_renewal_confirmation.deliver_now
     end
   end
 
@@ -30,7 +34,17 @@ namespace :contracts do
     contracts = Contract.today_expires_and_unconfirmed
     puts "Enqueuing expiery of #{contracts.count} contracts..."
     contracts.each do |contract|
-      ExpiredContractJob.perform_later(contract.id)
+      contract.expire!
+      contract.save
+
+      request = contract.request
+      request.remove_from_que!
+      request.unaccept!
+      request.unconfirm!
+      request.expire!
+      request.save
+      ContractMailer.with(contract: contract).contract_expired.deliver_now
     end
+    Request.calculate_que_number
   end
 end

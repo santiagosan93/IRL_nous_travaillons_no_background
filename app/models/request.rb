@@ -93,7 +93,7 @@ class Request < ApplicationRecord
     # send_contract_to_new_accepted_requests(new_requests)
     new_requests.each do |request|
       if request.contract.nil?
-        SendContractJob.perform_later(request.id)
+        RequestMailer.with(request: request).send_contract.deliver_now
         provisional_contract = Contract.new(expiery_date: Date.today + 7, confirmed: false, provisional: true)
         provisional_contract.request = request
         provisional_contract.save
@@ -128,7 +128,7 @@ class Request < ApplicationRecord
   private
 
   def send_confirmation_email
-    EmailConfirmationJob.perform_later(self.id)
+    RequestMailer.with(request: self).confirmation.deliver_now
   end
 
 end

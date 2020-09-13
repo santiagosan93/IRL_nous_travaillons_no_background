@@ -16,6 +16,5 @@ class ExpiredContractJob < ApplicationJob
     # I don't know yet how to chain background jobs, so the closest I could come up
     # with was to have this happening inside the job. The problem is thant this is inside
     # of an iteration, and im sure there is a cleaner way of writing this.
-    Request.calculate_que_number
   end
 end

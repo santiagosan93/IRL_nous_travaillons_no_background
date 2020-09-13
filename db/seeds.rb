@@ -19,7 +19,7 @@ puts "finished..."
 puts '-----'
 
 puts 'Generating 18 fake requests'
-19.times do
+18.times do
   request = Request.new(
     email: Faker::Internet.email,
     bio: "this is a short bio about myself",
@@ -41,12 +41,33 @@ end
 puts "finished..."
 puts '-----'
 
+puts "Creating a request with a contract that expires in 7 days"
+request = Request.new(
+  email: Faker::Internet.email,
+  bio: "this is a short bio about myself",
+  phone_number: '+33',
+  first_name: "i am a contract that expires in 7 days",
+  last_name: Faker::Name.last_name,
+  accepted: true,
+  confirmed: true,
+)
+9.times do
+  request.phone_number += rand(1..9).to_s
+end
+request.assign_que_number
+request.save!
+@contract = Contract.new(expiery_date: Date.today + 7, confirmed: false)
+@contract.request = request
+@contract.save
+puts "finished..."
+puts '-----'
+
 puts "Creating a request with a contract that expires today and hasn't been confirmed for renewal"
 request = Request.new(
   email: Faker::Internet.email,
   bio: "this is a short bio about myself",
   phone_number: '+33',
-  first_name: Faker::Name.first_name,
+  first_name: "i am a contract that expired today",
   last_name: Faker::Name.last_name,
   accepted: true,
   confirmed: true,
@@ -77,12 +98,15 @@ end
 request_santi.assign_que_number
 request_santi.save!
 
+
+puts "Creating a request that expires in 7 days"
 request_bea = Request.new(
   email: "bea@bea.com",
   bio: "this is a short bio about myself",
   phone_number: '+33',
-  first_name: "beatriz",
+  first_name: "i am a request that expiers in 7 days",
   last_name: "cobos",
+  expiery_date: Date.today + 7,
   confirmed: true,
 )
 9.times do

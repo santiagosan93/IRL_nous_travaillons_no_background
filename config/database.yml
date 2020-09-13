@@ -14,8 +14,8 @@ default: &default
 
 development:
   <<: *default
-  database: IRL_nous_travaillons
+  database: IRL_nous_travaillons_no_bg_jobs
 
 test:
   <<: *default
-  database: IRL_nous_travaillons
+  database: IRL_nous_travaillons_no_bg_jobs

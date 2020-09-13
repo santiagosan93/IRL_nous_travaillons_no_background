@@ -28,6 +28,7 @@ gem 'sidekiq-failures', '~> 1.0'
 
 gem 'letter_opener'
 gem 'letter_opener_web'
+gem 'faker'
 
 
 # Use Active Storage variant
@@ -48,7 +49,6 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'faker'
 end
 
 group :test do

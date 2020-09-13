@@ -36,7 +36,6 @@ namespace :contracts do
     contracts.each do |contract|
       contract.expire!
       contract.save
-
       request = contract.request
       request.remove_from_que!
       request.unaccept!

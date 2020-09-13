@@ -6,6 +6,10 @@ class Contract < ApplicationRecord
     self.expired = true
   end
 
+  def provisional?
+    self.provisional
+  end
+
   def confirm!
     self.confirmed = true
   end

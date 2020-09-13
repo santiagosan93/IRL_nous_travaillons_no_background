@@ -1,3 +1,11 @@
-<h1>Your contract has expired</h1>
-<p>Dear <%= @request.first_name.capitalize %></p>
-<p>Because of lack of confirmation we are sorry to tell you that your contract has expired. We wish you well and hope you return to Nous Travallions in the near future</p>
+<% if @contract.provisional? %>
+  <h1>Your spot wasn't confirmed</h1>
+  <p>Dear <%= @request.first_name.capitalize %></p>
+  <p>We are sorry to tell you that your request to join Nous Travallions has been declined due to lack of confirmation</p>
+  <p>If you still want to be part of our family, you have to restart the process al over again.</p>
+  <p></p>
+<% else %>
+  <h1>Your contract has expired</h1>
+  <p>Dear <%= @request.first_name.capitalize %></p>
+  <p>Because of lack of confirmation we are sorry to tell you that your contract has expired. We wish you well and hope you return to Nous Travallions in the near future.</p>
+<% end %>

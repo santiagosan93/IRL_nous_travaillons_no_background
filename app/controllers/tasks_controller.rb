@@ -142,5 +142,5 @@ class TasksController < ApplicationController
     puts "Congratulations you now have #{Request.count} requests and #{Contract.count} contracts"
     puts "End of seeds"
     puts '-----------'
-
+  end
 end

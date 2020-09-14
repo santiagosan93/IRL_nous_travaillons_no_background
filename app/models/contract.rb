@@ -25,7 +25,7 @@ class Contract < ApplicationRecord
 
   def self.expires_next_week
     next_week = Date.today + 7
-    Contract.where(expiery_date: next_week, provisional: false)
+    Contract.where(expiery_date: next_week, provisional: false, confirmed: true)
   end
 
   def self.valid_contracts

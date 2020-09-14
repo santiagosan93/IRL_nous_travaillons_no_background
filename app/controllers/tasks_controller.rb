@@ -143,4 +143,41 @@ class TasksController < ApplicationController
     puts "End of seeds"
     puts '-----------'
   end
+
+  def contracts_mark_expired
+    contracts = Contract.today_expires_and_unconfirmed
+    puts "Enqueuing expiery of #{contracts.count} contracts..."
+    contracts.each do |contract|
+      contract.expire!
+      contract.save
+      request = contract.request
+      request.remove_from_que!
+      request.unaccept!
+      request.unconfirm!
+      request.expire!
+      request.save
+      ContractMailer.with(contract: contract).contract_expired.deliver_now
+    end
+    Request.calculate_que_number
+  end
+
+  def contracts_send_renewal_email
+    contracts = Contract.expires_next_week
+    puts "Enqueuing confirmation of #{contracts.count} contracts..."
+    contracts.each do |contract|
+      contract.unconfirm!
+      contract.save
+      ContractMailer.with(contract: contract).contract_renewal_confirmation.deliver_now
+    end
+  end
+
+  def requests_send_renewal_email
+    requests = Request.unaccepted_and_still_interested
+    puts "Enqueuing confirmation of #{requests.count} requests..."
+    requests.each do |request|
+      request.confirmed = false
+      request.save
+      RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
+    end
+  end
 end

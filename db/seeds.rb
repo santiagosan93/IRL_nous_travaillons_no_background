@@ -19,7 +19,7 @@ puts "finished..."
 puts '-----'
 
 puts 'Generating 18 fake requests'
-18.times do
+17.times do
   request = Request.new(
     email: Faker::Internet.email,
     bio: "this is a short bio about myself",
@@ -57,6 +57,27 @@ end
 request.assign_que_number
 request.save!
 @contract = Contract.new(expiery_date: Date.today + 7, confirmed: false)
+@contract.request = request
+@contract.save
+puts "finished..."
+puts '-----'
+
+puts "Creating a request with a provisional contract that expires today"
+request = Request.new(
+  email: Faker::Internet.email,
+  bio: "this is a short bio about myself",
+  phone_number: '+33',
+  first_name: "i am a provisional contract that expired today",
+  last_name: Faker::Name.last_name,
+  accepted: true,
+  confirmed: true,
+)
+9.times do
+  request.phone_number += rand(1..9).to_s
+end
+request.assign_que_number
+request.save!
+@contract = Contract.new(expiery_date: Date.today, confirmed: false, provisional: true)
 @contract.request = request
 @contract.save
 puts "finished..."

@@ -88,7 +88,7 @@ class Request < ApplicationRecord
   end
 
   def self.unaccepted_and_still_interested
-    Request.where(accepted: false, expired: false, expiery_date: Date.today + 7)
+    Request.where(accepted: false, expired: false, expiery_date: Date.today + 7).where("que_number > 20")
   end
 
   private

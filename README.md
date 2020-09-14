@@ -21,6 +21,7 @@ So to create a request, the following attributes were taking under concideration
   * bio and phone_number     -> sugar for the challenge (strings)
   * confirmed                -> Let's us know if the user has clicked still interested when the 3 monts are about to come, or just confirmed his email upon                                    request creation (boolean)
   * expired                  -> Let's us know if the request is out of the que or not (boolean)
+  * expiery_date             -> The date in which the request will be taken out of the line if not confirmed (date)
   * accepted                 -> Meaning the request has been accepted into Nous Travaillons (boolean)
   * que_number               -> The position in which the request stands
   
@@ -103,7 +104,118 @@ This instance variable is used to display information accordingly when a request
 <% end %>
 ```
 
-In the example above you can notice that the app has different messages depending on the type of request `new/old`
+In the example above you can notice that the app has different messages depending on the type of request `new/old`. And thats it for the instance methods the rest are very self explainatory and you can check them out in the `Request.rb` file. Now let's move to what happens with the contracts as soon as a request is eligible to be part of the Nous Travallions family. 
+
+
+Contract Instance methods
+----------------------
+
+
+At the end of that previous code snipet you can see that there is a link that goes to an endpoint which creates a contract associated with that request. 
+This were the attributes chosen for this model. 
+
+* expiery_date             -> The date in which the contract will be expired if not confirmed and a new spot will be available for the people standing in the que (date)
+
+*expired --> This let's us know that the contract is no longer valid (boolean)
+    
+   
+* provisional -> This let's us know if the contract has ben sent to someone on the que_line that just got acces to the first 20. When a contract is provisional, the expiery_date is not set to the next month like the other normal contracts, but for the next week. This way if the spot is not confirmed, we can move the que faster. (boolean)
+   
+* confirmed -> Meaning that the contract is valid and the expiery_date will be posponed (boolean)
+* request_id -> Reference to the request that got accepted with the details of the user. 
+
+And this were the instance methods used for this class
+
+```ruby
+def expire!
+    self.expired = true
+  end
+
+  def provisional?
+    self.provisional
+  end
+
+  def confirm!
+    self.confirmed = true
+  end
+
+  def renew_expiery_date!
+    self.expiery_date = self.expiery_date.next_month
+    self.provisional = false
+  end
+
+  def unconfirm!
+    self.confirmed = false
+  end
+
+  def self.expires_next_week
+    next_week = Date.today + 7
+    Contract.where(expiery_date: next_week, provisional: false, confirmed: true)
+  end
+
+  def self.valid_contracts
+    Contract.where(provisional: false)
+  end
+
+  def self.today_expires_and_unconfirmed
+    Contract.where(expiery_date: Date.today, confirmed: false, expired: false)
+  end
+```
+
+which are self explainatory. If you remember on the view code snipet, you saw the route to create a Contract. so let's take a look at that. 
+```ruby
+ def create
+    @contract = Contract.new(expiery_date: Date.today.next_month)
+    @contract.request = @request
+    @contract.save!
+
+    @request.accept!
+    @request.save
+  end
+```
+
+as you can see a contract gets automatically created with the expiery_date set to a month from when the user signed the contract and assigns the corresponding request to the contract.
+
+The second controller method is the renewal_confirmation
+```ruby
+def renewal_confirmation
+  @new_contract = @contract.provisional
+  @contract.confirm!
+  @contract.renew_expiery_date!
+  @contract.save
+end
+```
+
+in there we also do the little is old record but this time not by checking the que_number, but by checking if the contract is provisional or not. So what does this provisional mean again? It means that when a user has left the company, We send mail automatically to the people next inline with a provisional contract already being created waiting confirmation form them. So if a new person confirms their provisional contract, then the welcome message should be more exciting than to the person that has an old contract. And here is how the view looks like for this signal flow.
+
+```ruby
+<% if @new_contract %>
+  <h1>Welcome to Nous Travallions!</h1>
+  <p>On behalf of the team we welcome you to this wonderfull comunity!</p>
+<% else %>
+  <h1>Thank you so much!</h1>
+  <p>We look forward to keep working with you</p>
+<% end %>
+```
+
+
+# Tasks
+
+Now here is where the magic happens in order to keep the que line going and the mails flowing. The app counts with three dailey tasks set by heroku scheduler. The first one `requests:send_renewal_email`, the second one `contracts:send_renewal_email`, and the third one `contracts:mark_expired`
+
+requests:send_renewal_email
+----------------
+
+```ruby
+requests = Request.unaccepted_and_still_interested
+ puts "Enqueuing confirmation of #{requests.count} requests..."
+ requests.each do |request|
+   request.confirmed = false
+   request.save
+   RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
+ end
+```
+what this task does, is it calls upon the Request class method `unaccepted_and_still_interested` which returns an array of instances with the attributes `expired` and `accepted` set to false where their expiery date is next week. and then for each and one of them, it sends a mail calling again the mailer `RequestMailer` in the action `request_renewal_confirmation` 
 
 
 

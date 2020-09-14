@@ -47,3 +47,5 @@ namespace :contracts do
     Request.calculate_que_number
   end
 end
+
+task daily: ["contracts:mark_expired", "contracts:send_renewal_email", "requests:send_renewal_email"]

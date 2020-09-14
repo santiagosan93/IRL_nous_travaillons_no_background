@@ -116,7 +116,7 @@ This were the attributes chosen for this model.
 
 * expiery_date             -> The date in which the contract will be expired if not confirmed and a new spot will be available for the people standing in the que (date)
 
-*expired --> This let's us know that the contract is no longer valid (boolean)
+* expired --> This let's us know that the contract is no longer valid (boolean)
     
    
 * provisional -> This let's us know if the contract has ben sent to someone on the que_line that just got acces to the first 20. When a contract is provisional, the expiery_date is not set to the next month like the other normal contracts, but for the next week. This way if the spot is not confirmed, we can move the que faster. (boolean)
@@ -208,14 +208,114 @@ requests:send_renewal_email
 
 ```ruby
 requests = Request.unaccepted_and_still_interested
- puts "Enqueuing confirmation of #{requests.count} requests..."
- requests.each do |request|
-   request.confirmed = false
-   request.save
-   RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
- end
+puts "Enqueuing confirmation of #{requests.count} requests..."
+requests.each do |request|
+  request.confirmed = false
+  request.save
+  RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
+end
 ```
 what this task does, is it calls upon the Request class method `unaccepted_and_still_interested` which returns an array of instances with the attributes `expired` and `accepted` set to false where their expiery date is next week. and then for each and one of them, it sends a mail calling again the mailer `RequestMailer` in the action `request_renewal_confirmation` 
+
+
+contracts:send_renewal_email
+------------
+
+This one is very similar than the provious one the only difference is that we are basing our mail sending based on contracts that are about to expire, instead of requests
+
+```ruby
+contracts = Contract.expires_next_week
+puts "Enqueuing confirmation of #{contracts.count} contracts..."
+contracts.each do |contract|
+  contract.unconfirm!
+  contract.save
+  ContractMailer.with(contract: contract).contract_renewal_confirmation.deliver_now
+end
+```
+
+contracts:mark_expired
+-----------
+
+And for last we have the third one which changes a little from the other two, since this time we don't have to only send a mail to records with a specic state, but we also need to recalculate the que_numbers for the entire que
+```ruby
+contracts = Contract.today_expires_and_unconfirmed
+    puts "Enqueuing expiery of #{contracts.count} contracts..."
+    contracts.each do |contract|
+      contract.expire!
+      contract.save
+      request = contract.request
+      request.remove_from_que!
+      request.unaccept!
+      request.unconfirm!
+      request.expire!
+      request.save
+      ContractMailer.with(contract: contract).contract_expired.deliver_now
+    end
+    Request.calculate_que_number
+  end
+```
+
+So as you can see the beguining is still the same as the other two. We change the value of the attributes of the record and then we send a mail. Now the meat comes in the Request class method `calculate_que_number` and this is how it looks
+
+```ruby
+def self.calculate_que_number
+  requests = Request.not_expired.order(:que_number)
+  Request.reassign_que_numbers(requests)
+  new_requests = Request.where(accepted: false).where("que_number <= 20")
+  Request.send_contract_to_new_accepted_requests(new_requests)
+end
+```
+
+so the functionality is split into 2 parts, the first one is recalculating the que numbers, and the second one is sending a mail to the people that were in cue and because of some contracts expirations, they are now elligible to sign one themselves.
+
+So the first two lines we get all the requests that aren't expired, and we sort them by their que_number. Since there maybe requests that left, the order of this might not be one by one, but sometimes it can have jumps. So in order to ensure that we have each request with a step of one between que_numbers, we call `the reassign_que_numbers` class method with the argument of our previous database query. This method looks like this. 
+```ruby
+def self.reassign_que_numbers(requests)
+  requests.each_with_index do |request, index|
+    request.que_number = index + 1
+    request.save
+  end
+end
+```
+
+And as you can see we just reassign que_numbers based on their index. This way we avoid que_number jumps.
+
+The second part of the method, is The sending of the mail of the people that were in line that now are available.
+```ruby
+def self.send_contract_to_new_accepted_requests(new_requests)
+  new_requests.each do |request|
+    if request.contract.nil?
+      RequestMailer.with(request: request).send_contract.deliver_now
+      provisional_contract = Contract.new(expiery_date: Date.today + 7, confirmed: false, provisional: true)
+      provisional_contract.request = request
+      provisional_contract.save
+    end
+  end
+end
+```
+
+so what happens here is that first we iterate over the array new_requests, if you recall from the parent method, you'll see that new_requests are requests under the max_capacity que_number, that havn't been accepted. So what we do here is first we check if the request has a provisional contract, meaning that this new request has already been sent the mail to sign a contract. If there is no provisional contract attached to this request, means that the request is completly new, and we create a provisional contract associated with that request. Note that the expiery date is set to 7 days after the mail has been sent and the provisional attribute is set to true. This will change if the user confirms the link sent in the mail in the first line of that if statement. 
+
+
+
+# Tests
+
+In order to run the tests of the app you need to have rspec installed in your machine and run the following command `rspec spec`
+
+You will find the tests inside the spec folder with test the mail sending and the validity of instances.
+
+# Production
+
+This demo is used with the `letter-opener-web` which enable us to preview the mails that will be sent. There is no actual domain that sends actual emails. Eventhough the server acts like if there were emails being sent to diffrent email addresses, there are none. 
+
+In order to see the previews you need to go to the endpoint `/letter_opener`
+
+# Disclaimers
+1 Unfortunatly the gem doesn't work with background jobs running in your app but,  feel free to cantact me if you want the version with this incorporated.
+
+2 The gem also picks up emails that were sent from the app after an http request. Therefore the gem won't work using tasks. For this workarround I created a Task controller with each task corresponding to 1 action. This way I can by pass it and the preview will still work. If you use the tasks the way they are supposed to, you will see in your server the mails being sent, but the preview won't be available.
+
+
 
 
 

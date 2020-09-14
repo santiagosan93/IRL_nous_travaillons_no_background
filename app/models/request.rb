@@ -62,9 +62,9 @@ class Request < ApplicationRecord
 
   def self.calculate_que_number
     requests = Request.not_expired.order(:que_number)
-    reassign_que_numbers(requests)
+    Request.reassign_que_numbers(requests)
     new_requests = Request.where(accepted: false).where("que_number <= 20")
-    send_contract_to_new_accepted_requests(new_requests)
+    Request.send_contract_to_new_accepted_requests(new_requests)
   end
 
   def self.unconfirmed
@@ -97,7 +97,7 @@ class Request < ApplicationRecord
     RequestMailer.with(request: self).confirmation.deliver_now
   end
 
-  def send_contract_to_new_accepted_requests(new_requests)
+  def self.send_contract_to_new_accepted_requests(new_requests)
     new_requests.each do |request|
       if request.contract.nil?
         RequestMailer.with(request: request).send_contract.deliver_now
@@ -108,7 +108,7 @@ class Request < ApplicationRecord
     end
   end
 
-  def reassign_que_numbers(requests)
+  def self.reassign_que_numbers(requests)
     requests.each_with_index do |request, index|
       request.que_number = index + 1
       request.save

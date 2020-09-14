@@ -19,4 +19,7 @@ Rails.application.routes.draw do
   end
 
   get 'seed', to: 'tasks#seed'
+  get 'contracts_mark_expired', to: 'tasks#contracts_mark_expired'
+  get 'contracts_send_renewal_email', to: 'tasks#contracts_send_renewal_email'
+  get 'requests_send_renewal_email', to: 'tasks#requests_send_renewal_email'
 end

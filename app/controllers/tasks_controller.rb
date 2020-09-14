@@ -179,6 +179,11 @@ class TasksController < ApplicationController
       contract.save
       ContractMailer.with(contract: contract).contract_renewal_confirmation.deliver_now
     end
+    if Rails.env.development?
+      redirect_to "http://localhost:3000/letter_opener"
+    else
+      redirect_to "https://irl-nous-trvlins-no-bg-jobs.herokuapp.com/letter_opener"
+    end
   end
 
   def requests_send_renewal_email

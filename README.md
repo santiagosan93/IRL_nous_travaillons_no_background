@@ -15,6 +15,21 @@ When the ques are very long, people might have to wait a year or more in order t
 Creating a Request
 ----------------
 
+So to create a request, the following attributes were taking under concideration: 
+  first_name and last_name -> tells us who made it (string)
+  email                    -> tells us who do we need to send a mail to (string)
+  bio and phone_number     -> sugar for the challenge (strings)
+  confirmed                -> Let's us know if the user has clicked still interested when the 3 monts are about to come, or just confirmed his email upon         .                           request creation (boolean)
+  expired                  -> Let's us know if the request is out of the que or not (boolean)
+  accepted                 -> Meaning the request has been accepted into Nous Travaillons (boolean)
+  que_number               -> The position in which the request stands
+  
+ 
+  
+  
+  
+  
+
 
 
 

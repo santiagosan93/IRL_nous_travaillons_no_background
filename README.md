@@ -26,15 +26,16 @@ So to create a request, the following attributes were taking under concideration
   
 That being said, the only thing you need to do to create a request, is in your console type something like this
 
-`Request.create(
+```ruby
+Request.create(
   email: alejandro@shell.com,
   bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33 123456789',
   first_name: "Alejandro",
   last_name: "Huertas",
 )
-
-Now, notice that the **confirmed** **accepted** **que_number** are not specified in the block of code above. That's because the first two default to false, and the third aspect, we will cover when we get to class and instance methods.  
+```
+Now, notice that the **confirmed**, **accepted**, and **que_number** are not specified in the block of code above. That's because the first two default to false, and the third aspect, we will cover when we get to class and instance methods.  
  
   
   

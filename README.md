@@ -35,8 +35,14 @@ Request.create(
   last_name: "Huertas",
 )
 ```
-Now, notice that the **confirmed**, **accepted**, and **que_number** are not specified in the block of code above. That's because the first two default to false, and the third aspect, we will cover when we get to class and instance methods.  
- 
+Now, notice that the **confirmed**, **accepted**, and **que_number** are not specified in the block of code above. That's because the first two default to false, and the third aspect, will be explained in the next Section
+
+Request Instance Methods and callback
+-----------------------
+
+We only have one callback in this method being called `after_create`
+
+
   
   
   

@@ -1,18 +1,32 @@
 class Request < ApplicationRecord
   after_create :send_confirmation_email
 
+  validates :email, uniqueness: { scope: [:expired] }
+  validates :phone_number, uniqueness: { scope: [:expired] }
+
   validates :first_name, :last_name, :email, :bio, :phone_number, presence: true
-  validates :email, uniqueness: true
 
   validates :phone_number, format: {
-    with: /^((\+)33|0)[1-9](\d{2}){4}$/,
-    message: "- Make sure you're typing in a french number", multiline: true
+    with: /^((\+)33|0)[1-9]{9}$/,
+    message: "- Make sure you're typing in a french number",
+     multiline: true
   }
 
+  # validates :first_name, format: {
+  #   with: /^[A-Za-z]{2,20}+([\ A-Za-z]+)*$/,
+  #   message: "- Make sure you're typing in a real name",
+  #   multiline: true
+  # }
+
   validates :email, format: {
-    with: /([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})/,
-    message: "- You've entered an invalid email"
+    with: /([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/,
+    message: "- You've entered an invalid email",
+    multiline: true
   }
+
+  validates :bio, length: { minimum: 40 }
+  validates :first_name, length: { maximum: 60 }
+  validates :first_name, length: { minimum: 2 }
 
   has_one :contract
 

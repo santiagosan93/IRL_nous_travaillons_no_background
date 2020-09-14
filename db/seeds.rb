@@ -22,7 +22,7 @@ puts 'Generating 18 fake requests'
 17.times do
   request = Request.new(
     email: Faker::Internet.email,
-    bio: "this is a short bio about myself",
+    bio: "this is a short bio about myself and I love playing guitar",
     phone_number: '+33',
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,
@@ -44,7 +44,7 @@ puts '-----'
 puts "Creating a request with a contract that expires in 7 days"
 request = Request.new(
   email: Faker::Internet.email,
-  bio: "this is a short bio about myself",
+  bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33',
   first_name: "i am a contract that expires in 7 days",
   last_name: Faker::Name.last_name,
@@ -65,7 +65,7 @@ puts '-----'
 puts "Creating a request with a provisional contract that expires today"
 request = Request.new(
   email: Faker::Internet.email,
-  bio: "this is a short bio about myself",
+  bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33',
   first_name: "i am a provisional contract that expired today",
   last_name: Faker::Name.last_name,
@@ -86,7 +86,7 @@ puts '-----'
 puts "Creating a request with a contract that expires today and hasn't been confirmed for renewal"
 request = Request.new(
   email: Faker::Internet.email,
-  bio: "this is a short bio about myself",
+  bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33',
   first_name: "i am a contract that expired today",
   last_name: Faker::Name.last_name,
@@ -107,7 +107,7 @@ puts '-----'
 puts "Creating 2 requests on que"
 request_santi = Request.new(
   email: "santi@santi.com",
-  bio: "this is a short bio about myself",
+  bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33',
   first_name: "santiago",
   last_name: "sanchez",
@@ -123,7 +123,7 @@ request_santi.save!
 puts "Creating a request that expires in 7 days"
 request_bea = Request.new(
   email: "bea@bea.com",
-  bio: "this is a short bio about myself",
+  bio: "this is a short bio about myself and I love playing guitar",
   phone_number: '+33',
   first_name: "i am a request that expiers in 7 days",
   last_name: "cobos",

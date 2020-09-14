@@ -17,4 +17,6 @@ Rails.application.routes.draw do
       get 'renewal_confirmation'
     end
   end
+
+  get 'seed', to: 'pages#seed'
 end

@@ -35,12 +35,77 @@ Request.create(
   last_name: "Huertas",
 )
 ```
-Now, notice that the **confirmed**, **accepted**, and **que_number** are not specified in the block of code above. That's because the first two default to false, and the third aspect, will be explained in the next Section
+Now, notice that the **confirmed**, **accepted** **expiery_date**, and **que_number** are not specified in the block of code above. That's because the first two default to false, the third one defaults to 3 months from the momment of creation and the third aspect, will be explained in the next Section
 
 Request Instance Methods and callback
 -----------------------
 
-We only have one callback in this method being called `after_create`
+We only have one callback in this method named `send_confirmation_email` which is triggered `after_create` of each instance. This callback will trigger the mailer `RequestMailer` on the action `confirmation` sending a confirmation mail which you can edit in `app/views/request_mailer/confirmation.html.erb`
+
+When the mail has been recieved, the user has the option to click on a link that will trigger the route `email_confirmation`. This route has the purpose of changin the instance confirmed attribute to `true` and assign a que_number. This leads us to our first instance method. 
+
+The `assign_que_number` method asks the data base first if its empty of requests. If it is, it will assign the request with a que_number of 1. Otherwise it will query the database for the highest que_number within our requets and assign that one plus one
+``` ruby
+def assign_que_number
+  if Request.all.empty?
+    self.que_number = 1
+  else
+    self.que_number = Request.maximum(:que_number) + 1
+  end
+end
+```
+
+The second method I want to speak about is `renew_expiery_date`. This method gets triggered as soon as a user clicks on the link inside the `request_renewall_confirmation` mail telling us that they are still intered in being part of the que (this mail is being sent through a `rake task` :skip to the bottom of this read me:). In the signal flow, we can see that this method is being called in the `email_confirmation` method inside the `requests_controller` Where the expiery date of the confirmed request will be moved back 30 days from the momment the user clicked on the confirmation link. 
+
+```ruby
+#controller
+  def email_confirmation
+    @request.confirm!
+    @is_old_request = @request.has_que_number
+    @request.assign_que_number unless @request.has_que_number
+    @request.renew_expiery_date
+    @request.save
+  end
+ 
+ #model
+ def renew_expiery_date
+    self.expiery_date = Date.today.next_month(3)
+  end
+```
+
+if you take a look, inside that controller action we have another method that is being used to set the value of the instance variable `@is_old_request`. The `has_que_number` checks if is the renewall of an old request or a new request by determing weather it has a que_number or not. Some requests may have que_number assign to nil because if the request it's completly new and hasn't been confirmed, we don't want to git it a spot in the que over users that take it seriously and confirm the mail as soon as they get it. 
+
+This instance variable is used to display information accordingly when a request is newly_confirmed/confirmed
+```ruby
+<h1>Thank you so mutch. You're request has been confirmed!</h1>
+
+<% if @request.que_number > @max_capacity %>
+
+  <% if @is_old_request %>
+
+    <p>Thanks for still being interested in our service</p>
+    <p>We will keep you posted as soon as there is space for you</p>
+
+  <% else %>
+
+    <p>Currently our office is full, and as soon as we have space for you wi will let you know</p>
+
+  <% end %>
+
+  <p>Your current number in the waiting list is <%= @request.que_number - @max_capacity %> </p>
+  <%= link_to 'Home', root_path  %>
+
+<% else %>
+
+  <p>Congratualions! You are eligible to take part of the nous travaillons expirience</p>
+  <%= link_to "I understand the legal terms of the contract and I want to sign it", request_contracts_url(@request), method: :post  %>
+
+<% end %>
+```
+
+In the example above you can notice that the app has different messages depending on the type of request `new/old`
+
+
 
 
   

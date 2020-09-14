@@ -56,7 +56,7 @@ request = Request.new(
 end
 request.assign_que_number
 request.save!
-@contract = Contract.new(expiery_date: Date.today + 7, confirmed: false)
+@contract = Contract.new(expiery_date: Date.today + 7, confirmed: true)
 @contract.request = request
 @contract.save
 puts "finished..."

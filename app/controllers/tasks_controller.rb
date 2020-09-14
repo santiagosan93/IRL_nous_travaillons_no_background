@@ -1,4 +1,5 @@
 class TasksController < ApplicationController
+  after_action :redirect_to_letter_opener
   def seed
     # This file should contain all the record creation needed to seed the database with its default values.
     # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
@@ -178,6 +179,16 @@ class TasksController < ApplicationController
       request.confirmed = false
       request.save
       RequestMailer.with(request: request).request_renewal_confirmation.deliver_now
+    end
+  end
+
+  private
+
+  def redirect_to_letter_opener
+    if Rails.env.development?
+      redirect_to "http://localhost:3000/letter_opener"
+    else
+      redirect_to "https://irl-nous-trvlins-no-bg-jobs.herokuapp.com/letter_opener"
     end
   end
 end

@@ -18,5 +18,5 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'seed', to: 'pages#seed'
+  get 'seed', to: 'tasks#seed'
 end
